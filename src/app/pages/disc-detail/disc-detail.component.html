@@ -1,0 +1,80 @@
+<!-- disc-detail.component.html -->
+   <!-- Debug Info (remove after fixing) 
+  <div style="background: yellow; padding: 10px; margin: 10px 0;">
+    <strong>DEBUG:</strong><br>
+    isLoading: {{ isLoading }}<br>
+    notFound: {{ notFound }}<br>
+    disc exists: {{ !!disc }}<br>
+    disc name: {{ disc?.name }}
+  </div>-->
+<div class="disc-detail-container">
+  <!-- Loading State -->
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading disc details...</p>
+  </div>
+
+  <!-- Not Found State -->
+  <div class="not-found" *ngIf="notFound && !isLoading">
+    <div class="not-found-icon">🎵</div>
+    <h2>Disc Not Found</h2>
+    <p>Sorry, we couldn't find the disc you're looking for.</p>
+    <button (click)="goBack()" class="back-button">
+      ← Back to Search
+    </button>
+  </div>
+
+  <!-- Disc Details -->
+  <div class="disc-detail" *ngIf="disc && !isLoading">
+    <button (click)="goBack()" class="back-button">
+      ← Back to Search
+    </button>
+
+    <div class="detail-content">
+      <div class="disc-image-section">
+        <img [src]="disc.imageUrl" [alt]="disc.name" class="disc-cover" />
+      </div>
+
+      <div class="disc-info-section">
+        <h1 class="disc-title">{{ disc.name }}</h1>
+        <h2 class="disc-artist">{{ disc.artist }}</h2>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Release Date</span>
+            <span class="info-value">{{ disc.releaseDate | date: 'MMMM d, y' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Genre</span>
+            <span class="info-value">{{ disc.genre }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Label</span>
+            <span class="info-value">{{ disc.label }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Tracks</span>
+            <span class="info-value">{{ disc.trackCount }} tracks</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Duration</span>
+            <span class="info-value">{{ disc.duration ? formatDuration(disc.duration) : 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action-button primary" (click)="playAlbum()">
+            ▶ Play Album
+          </button>
+          <button class="action-button secondary" (click)="addToFavorites()">
+            ♥ Add to Favorites
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
