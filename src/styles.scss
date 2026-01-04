@@ -1,5 +1,5 @@
  :host {
-    --bright-blue: oklch(38.242% 0.20265 263.465);
+    --bright-blue: #1a1a2e;
     --electric-violet: #18285f;
     --hot-red: oklch(61.42% 0.238 15.34);
     --orange-red: oklch(63.32% 0.24 31.68);
@@ -7,6 +7,8 @@
     --gray-900: oklch(19.37% 0.006 300.98);
     --gray-700: oklch(36.98% 0.014 302.71);
     --gray-400: oklch(91.881% 0.01416 303.899);
+    --yellow: #e9c93c;
+    --white: #fff;
 
     --red-to-pink-to-purple-vertical-gradient: linear-gradient(
       180deg,
