@@ -1,26 +1,18 @@
-import { NgModule } from '@angular/core';
+// app.config.ts (для standalone приложения)
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { routes } from './app-routing.module';
-import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideStore } from '@ngxs/store';
+import { provideHttpClient } from '@angular/common/http';
 
+import { routes } from './app.routes';
+import { SearchState } from './store/search/search.state';
+import { FavoritesState } from './store/favorites/favorites.state';
+import { HistoryState } from './store/history/history.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes)
+    provideRouter(routes),
+    provideHttpClient(),
+    provideStore([SearchState, FavoritesState, HistoryState])
   ]
-}
-
-@NgModule({
-  imports: [
-    AppComponent,
-    BrowserModule,
-    HttpClientModule,
-    RouterModule.forRoot(routes) // ВАЖНО!
-  ],
-  providers: [],  
-})
-export class AppModule { }
+};

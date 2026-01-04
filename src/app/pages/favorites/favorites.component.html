@@ -1,0 +1,60 @@
+<!-- pages/favorites/favorites.component.html -->
+<div class="favorites-container">
+  <div class="favorites-header">
+    <h1>❤️ My Favorites</h1>
+  </div>
+
+  <ng-container *ngIf="(favorites$ | async) as favorites">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="favorites.length === 0">
+      <div class="empty-icon">💿</div>
+      <h2>No favorites yet</h2>
+      <p>Start adding albums you love to your favorites</p>
+      <button class="browse-button" routerLink="/search">
+        Browse Albums
+      </button>
+    </div>
+
+    <div *ngIf="favorites.length > 0">
+      <div class="history-actions">
+        <p class="favorites-count">
+          {{ favorites.length }} favorite{{ favorites.length !== 1 ? 's' : '' }}
+        </p>
+        <button class="clear-button" (click)="clearAllFavorites()">
+          Clear All
+        </button>
+      </div>
+
+      <div class="result-grid">
+        <div
+          *ngFor="let disc of favorites" 
+          class="disc-card"
+          (click)="onDiscClick(disc)"
+        >
+          <div class="disc-image-container">
+            <img 
+              [src]="disc.imageUrl" 
+              [alt]="disc.name" 
+              class="disc-image"
+            />
+            <button 
+              class="clear-button" 
+              (click)="removeFromFavorites(disc.id, $event)"
+              title="Remove from favorites"
+            >
+              Remove from favorites
+            </button>
+          </div>
+          
+          <div class="disc-info">
+            <h3 class="disc-name">{{ disc.name }}</h3>
+            <p class="disc-artist">{{ disc.artist }}</p>
+            <p class="disc-date" *ngIf="disc.releaseDate">
+              {{ disc.releaseDate | date:'MMM d, y' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

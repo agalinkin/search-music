@@ -1,9 +1,15 @@
 // components/disc-detail/disc-detail.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngxs/store';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 import { MusicApiService } from '../../services/music-api.service';
 import { Disc } from '../../models/disc.interface';
+import { FavoritesState } from '../../store/favorites/favorites.state';
+import { AddToFavorites, RemoveFromFavorites } from '../../store/favorites/favorites.actions';
 
 @Component({
   selector: 'app-disc-detail',
@@ -12,16 +18,19 @@ import { Disc } from '../../models/disc.interface';
   templateUrl: './disc-detail.component.html',
   styleUrl: './disc-detail.component.scss'
 })
-export class DiscDetailComponent implements OnInit {
+export class DiscDetailComponent implements OnInit, OnDestroy {
   disc: Disc | null = null;
   isLoading = true;
   notFound = false;
+  
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private musicApiService: MusicApiService,
-    public cdr: ChangeDetectorRef  // Изменено на public
+    private store: Store,
+    public cdr: ChangeDetectorRef
   ) {
     console.log('DiscDetailComponent constructor called');
   }
@@ -40,36 +49,81 @@ export class DiscDetailComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadDiscDetails(id: string): void {
     console.log('Loading disc details for ID:', id);
-    console.log('isLoading before:', this.isLoading);
     this.isLoading = true;
-    this.cdr.detectChanges(); // Принудительно обновляем UI
+    this.cdr.detectChanges();
     
-    this.musicApiService.getDiscById(id).subscribe({
+    this.musicApiService.getDiscById(id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (disc) => {
         console.log('Received disc in component:', disc);
-        console.log('Disc is truthy?', !!disc);
         if (disc) {
           this.disc = disc;
           this.notFound = false;
-          console.log('this.disc set to:', this.disc);
-          console.log('this.notFound:', this.notFound);
+          console.log('Disc loaded:', this.disc.name);
+          console.log('Is in favorites?', this.isInFavorites);
         } else {
           console.warn('Disc is null or undefined');
           this.notFound = true;
         }
         this.isLoading = false;
-        console.log('isLoading after:', this.isLoading);
-        this.cdr.detectChanges(); // Принудительно обновляем UI
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error loading disc details:', error);
         this.notFound = true;
         this.isLoading = false;
-        this.cdr.detectChanges(); // Принудительно обновляем UI
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  // Check if current disc is in favorites
+  get isInFavorites(): boolean {
+    if (!this.disc) return false;
+    const isFav = this.store.selectSnapshot(FavoritesState.isInFavorites)(this.disc.id);
+    return isFav;
+  }
+
+  // Toggle favorite status
+  toggleFavorite(): void {
+    if (!this.disc) {
+      console.error('DiscDetailComponent: No disc available to favorite');
+      return;
+    }
+
+    if (this.isInFavorites) {
+      console.log('DiscDetailComponent: Removing from favorites:', this.disc.name);
+      this.store.dispatch(new RemoveFromFavorites(this.disc.id));
+    } else {
+      console.log('DiscDetailComponent: Adding to favorites:', this.disc);
+      this.store.dispatch(new AddToFavorites(this.disc));
+    }
+    
+    // Force UI update
+    this.cdr.detectChanges();
+  }
+
+  // Legacy methods (keep for backward compatibility if needed)
+  addToFavorites(): void {
+    if (!this.disc) return;
+    console.log('DiscDetailComponent: addToFavorites called');
+    this.store.dispatch(new AddToFavorites(this.disc));
+    this.cdr.detectChanges();
+  }
+
+  removeFromFavorites(): void {
+    if (!this.disc) return;
+    console.log('DiscDetailComponent: removeFromFavorites called');
+    this.store.dispatch(new RemoveFromFavorites(this.disc.id));
+    this.cdr.detectChanges();
   }
 
   goBack(): void {
@@ -89,27 +143,8 @@ export class DiscDetailComponent implements OnInit {
 
   playAlbum(): void {
     if (this.disc && this.disc.id) {
-      // Открыть альбом в Spotify
       const spotifyUrl = `https://open.spotify.com/album/${this.disc.id}`;
       window.open(spotifyUrl, '_blank');
-    }
-  }
-
-  addToFavorites(): void {
-    if (this.disc) {
-      // Сохранить в localStorage
-      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-      
-      // Проверить, не добавлен ли уже
-      const alreadyExists = favorites.some((fav: Disc) => fav.id === this.disc!.id);
-      
-      if (!alreadyExists) {
-        favorites.push(this.disc);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-        alert('Added to favorites!');
-      } else {
-        alert('Already in favorites!');
-      }
     }
   }
 }

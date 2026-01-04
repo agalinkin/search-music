@@ -62,16 +62,23 @@
 
           <div class="info-item">
             <span class="info-label">Duration</span>
-            <span class="info-value">{{ disc.duration ? formatDuration(disc.duration) : 'N/A' }}</span>
+            <span class="info-value">{{ disc.duration ? formatDuration(disc.duration) : 'N/A' }}</span>            
           </div>
         </div>
 
-        <div class="actions">
-          <button class="action-button primary" (click)="playAlbum()">
+        <!-- Update the favorite button section -->
+        <div class="action-buttons">
+          <button class="play-button" (click)="playAlbum()" *ngIf="disc">
             ▶ Play Album
-          </button>
-          <button class="action-button secondary" (click)="addToFavorites()">
-            ♥ Add to Favorites
+          </button> 
+          
+          <button 
+            class="favorite-button"
+            [class.is-favorite]="isInFavorites"
+            (click)="toggleFavorite()"
+            *ngIf="disc"
+          >
+            {{ isInFavorites ? '❤️ Remove from Favorites' : '🤍 Add to Favorites' }}
           </button>
         </div>
       </div>

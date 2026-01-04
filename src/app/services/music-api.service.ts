@@ -1,9 +1,10 @@
 // services/music-api.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of, from } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import { map, catchError, switchMap,shareReplay } from 'rxjs/operators';
 import { Disc } from '../models/disc.interface';
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class MusicApiService {
   private apiUrl = 'https://api.spotify.com/v1';
   private accessToken: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(@Inject(HttpClient) private http: HttpClient) {}
 
   // Получить токен доступа
   private getAccessToken(): Observable<string> {

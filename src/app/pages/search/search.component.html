@@ -2,77 +2,77 @@
 <div class="search-container">
   <div class="search-header">
     <h1>Search</h1>
-    
-    <div class="search-box">
-      <input 
-        type="text" 
-        [(ngModel)]="searchQuery"
-        (input)="onSearchInput($event)"
-        (keyup.enter)="onSearchSubmit()"
-        placeholder="Search for discs or artists..."
-        class="search-input"
-      />
-      <button 
-        (click)="onSearchSubmit()" 
-        class="search-button"
-        [disabled]="!searchQuery.trim()"
-      >
-        Search
-      </button>
-    </div>
   </div>
 
-  <!-- Search History -->
-  <div class="search-history" *ngIf="searchHistory.length > 0 && !hasSearched">
-    <div class="history-header">
-      <h3>Recent Searches</h3>
-      <button (click)="clearHistory()" class="clear-button">Clear All</button>
-    </div>
-    
-    <div class="history-list">
-      <div 
-        *ngFor="let item of searchHistory" 
-        class="history-item"
-        (click)="onHistoryItemClick(item)"
-      >
-        <div class="history-icon">🔍</div>
-        <div class="history-content">
-          <span class="history-query">{{ item.query }}</span>
-          <span class="history-meta">
-            {{ item.resultsCount }} result{{ item.resultsCount !== 1 ? 's' : '' }} · 
-            {{ formatDate(item.timestamp) }}
-          </span>
-        </div>
-      </div>
-    </div>
+  <div class="search-box">
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      (input)="onSearchInput($event)"
+      (keyup.enter)="onSearchSubmit()"
+      placeholder="Search for discs or artists..."
+      class="search-input"
+    />
+    <button
+      (click)="onSearchSubmit()"
+      class="search-button"
+      [disabled]="!searchQuery || searchQuery.trim().length < MIN_SEARCH_LENGTH"
+    >
+      Search
+    </button>
   </div>
+
+  <p class="min-length-hint" *ngIf="showMinLengthHint">
+    Please enter at least {{MIN_SEARCH_LENGTH}} characters to search
+  </p>
 
   <!-- Loading State -->
-  <div class="loading" *ngIf="isLoading">
+  <div class="loading" *ngIf="(isLoading$ | async)">
     <div class="spinner"></div>
     <p>Searching...</p>
   </div>
 
   <!-- Search Results -->
-  <div class="search-results" *ngIf="hasSearched && !isLoading">
-    <h2 *ngIf="searchResults.length > 0">
-      Found {{ searchResults.length }} result{{ searchResults.length !== 1 ? 's' : '' }}
-    </h2>
-    <p *ngIf="searchResults.length === 0" class="no-results">
-      No results found for "{{ searchQuery }}"
-    </p>
+  <div class="search-results" *ngIf="(hasSearched$ | async) && !(isLoading$ | async)">
+    <ng-container *ngIf="(searchResults$ | async) as results">
+      <h2 *ngIf="results.length > 0">
+        Found {{ results.length }} result{{ results.length !== 1 ? 's' : '' }}
+      </h2>
+      <p *ngIf="results.length === 0" class="no-results">
+        No results found for "{{ searchQuery }}"
+      </p>
 
-    <div class="results-grid">
-      <div 
-        *ngFor="let disc of searchResults" 
-        class="disc-card"
-        (click)="onDiscClick(disc)"
-      >
-        <img [src]="disc.imageUrl" [alt]="disc.name" class="disc-image" />
-        <div class="disc-info">
-          <h3 class="disc-name">{{ disc.name }}</h3>
-          <p class="disc-artist">{{ disc.artist }}</p>
-          <p class="disc-date">{{ disc.releaseDate | date: 'MMM d, y' }}</p>
+      <div class="results-grid">
+        <div
+          *ngFor="let disc of results"
+          class="disc-card"
+          (click)="onDiscClick(disc)"
+        >
+          <img [src]="disc.imageUrl" [alt]="disc.name" class="disc-image" />
+          <div class="disc-info">
+            <h3 class="disc-name">{{ disc.name }}</h3>
+            <p class="disc-artist">{{ disc.artist }}</p>
+            <p class="disc-date">{{ disc.releaseDate | date:'MMM d, y' }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Search History -->
+  <div class="search-history" *ngIf="(searchHistory$ | async) as history">
+    <div *ngIf="history.length > 0 && !(hasSearched$ | async)">
+      <div class="history-header">
+        <h3>Recent Searches</h3>
+        <a routerLink="/history" class="view-all-button">View All</a>
+      </div>
+      <div class="history-list">
+        <div
+          *ngFor="let item of history"
+          class="history-item"
+          (click)="onHistoryItemClick(item)"
+        >
+          <span class="history-query">{{ item.query }}</span>
         </div>
       </div>
     </div>
