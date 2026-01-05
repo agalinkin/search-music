@@ -1,17 +1,187 @@
-nav {
-  background: var(--electric-violet);
-  padding: 10px 20px;
+// components/header/header.component.scss
+.main-header {
+  background: #1a1a2e;
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    font-size: 1.2rem;
+     a {
+    text-decoration: none;
+    color: inherit;
+  
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
 }
 
-a {
-  margin-right: 10px;
-  text-decoration: none;
-  color: var(--white);
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+
+  a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 }
 
-nav a:hover {
-  color: var(--yellow);
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+
+  a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      color: white;
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  .user-menu {
+    display: flex;
+    gap: 10px;
+    /* justify-content: center; */
+    align-items: center;
+  }
+
+  .username {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+  }
+
+  button,a {
+    padding: 0.625rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+    }
+
+    &.btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    &.btn-spotify {
+      background: #1DB954;
+      color: white;
+
+      &:hover {
+        background: #1ed760;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 968px) {
+  .header-content {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-header {
+    padding: 1rem;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+  }
+
+  .nav-links {
+    gap: 0.5rem;
+
+    a {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  .user-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    .username {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
 }

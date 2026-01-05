@@ -1,18 +1,50 @@
 <!-- search.component.html -->
-<div class="search-container">
+<div class="search-container" (click)="onClickOutside($event)">
   <div class="search-header">
     <h1>Search</h1>
   </div>
 
   <div class="search-box">
-    <input
-      type="text"
-      [(ngModel)]="searchQuery"
-      (input)="onSearchInput($event)"
-      (keyup.enter)="onSearchSubmit()"
-      placeholder="Search for discs or artists..."
-      class="search-input"
-    />
+    <div class="search-input-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput($event)"
+        (keydown)="onSearchKeydown($event)"
+        (keyup.enter)="onSearchSubmit()"
+        placeholder="Search for discs or artists..."
+        class="search-input"
+        autocomplete="off"
+      />
+      
+      <!-- Autocomplete Dropdown -->
+      <div class="autocomplete-dropdown" *ngIf="showAutocomplete && autocompleteResults.length > 0">
+        <div class="autocomplete-header">
+          <span class="autocomplete-title">Suggestions</span>
+          <span class="autocomplete-hint">Press ↑↓ to navigate, Enter to select</span>
+        </div>
+        <div
+          *ngFor="let disc of autocompleteResults; let i = index"
+          class="autocomplete-item"
+          [class.selected]="i === selectedAutocompleteIndex"
+          (click)="onAutocompleteSelect(disc)"
+          (mouseenter)="selectedAutocompleteIndex = i"
+        >
+          <img [src]="disc.imageUrl" [alt]="disc.name" class="autocomplete-image" />
+          <div class="autocomplete-info">
+            <span class="autocomplete-name">{{ disc.name }}</span>
+            <span class="autocomplete-artist">{{ disc.artist }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading indicator in autocomplete -->
+      <div class="autocomplete-loading" *ngIf="showAutocomplete && (isLoading$ | async)">
+        <div class="spinner-small"></div>
+        <span>Searching...</span>
+      </div>
+    </div>
+
     <button
       (click)="onSearchSubmit()"
       class="search-button"
@@ -26,8 +58,12 @@
     Please enter at least {{MIN_SEARCH_LENGTH}} characters to search
   </p>
 
+  <p class="autocomplete-hint-text" *ngIf="searchQuery.length >= MIN_SEARCH_LENGTH && searchQuery.length < AUTOCOMPLETE_LENGTH && !showMinLengthHint">
+    Type {{AUTOCOMPLETE_LENGTH - searchQuery.length}} more character(s) for suggestions
+  </p>
+
   <!-- Loading State -->
-  <div class="loading" *ngIf="(isLoading$ | async)">
+  <div class="loading" *ngIf="(isLoading$ | async) && !showAutocomplete">
     <div class="spinner"></div>
     <p>Searching...</p>
   </div>
@@ -72,7 +108,12 @@
           class="history-item"
           (click)="onHistoryItemClick(item)"
         >
+          <svg class="history-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
           <span class="history-query">{{ item.query }}</span>
+          <span class="history-count">{{ item.resultCount }} results</span>
         </div>
       </div>
     </div>
