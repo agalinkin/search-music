@@ -25,7 +25,7 @@ export class UserRegistrationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Если уже залогинен, редирект
+    // If already logged in, redirect to search
     if (this.authService.isLoggedIn) {
       this.router.navigate(['/search']);
       return;
@@ -50,15 +50,17 @@ export class UserRegistrationComponent implements OnInit {
 
       const { email, username, password } = this.registrationForm.value;
 
-      this.authService.register(email, username, password).subscribe({
+      this.authService.register(email, password, username).subscribe({
         next: (success) => {
           if (success) {
-            // Перенаправить на подключение Spotify
-            this.router.navigate(['/spotify-connect']);
+            // ✅ Redirect to search page after successful registration
+            console.log('Registration successful, redirecting to search...');
+            this.router.navigate(['/search']);
           }
         },
         error: (error) => {
-          this.errorMessage = 'Registration failed. Please try again.';
+          console.error('Registration error:', error);
+          this.errorMessage = error?.error?.message || 'Registration failed. Please try again.';
           this.isSubmitting = false;
         },
         complete: () => {

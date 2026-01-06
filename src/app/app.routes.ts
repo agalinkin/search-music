@@ -10,7 +10,7 @@ import { DiscDetailComponent } from './pages/disc-detail/disc-detail.component';
 import { SearchHistoryComponent } from './pages/search-history/search-history.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/search', pathMatch: 'full' },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: UserRegistrationComponent },
   { path: 'spotify-connect', component: SpotifyConnectComponent, canActivate: [AuthGuard] },
@@ -18,5 +18,5 @@ export const routes: Routes = [
   { path: 'favorites', component: FavoritesComponent, canActivate: [AuthGuard] },
   { path: 'history', component: SearchHistoryComponent, canActivate: [AuthGuard] },
   { path: 'disc/:id', component: DiscDetailComponent },
-  { path: '**', redirectTo: '/search' }
+  { path: '**', redirectTo: '/login' }
 ];
